@@ -73,6 +73,7 @@ export default class game extends Phaser.Scene {
         this.rondaalive = false
         this.valortank = 150
         this.valorhalfer = 50
+        this.costoMejora = 0
 
 
         //Vars UI
@@ -94,6 +95,7 @@ export default class game extends Phaser.Scene {
         this.rondaUI
         this.textomejoraH
         this.textomejoraT
+
 
 
     }
@@ -305,6 +307,7 @@ export default class game extends Phaser.Scene {
                 self.turretUpgrade.add(self.add.text(740, 400, "Daño: ").setOrigin(0.5), false).setDepth(1)
 
 
+
                 self.textomejora = self.add.text(740, 450, "MEJORAR").setOrigin(0.5).setInteractive().setDepth(1)
 
                 self.turretUpgrade.add(self.textomejora, false)
@@ -316,6 +319,9 @@ export default class game extends Phaser.Scene {
                 self.textomejora.on("pointerout", function () {
                     self.textomejora.setColor("#ffffff")
                 })
+                self.turretUpgrade.add(self.add.image(710, 480, "coin").setScale(0.05), false).setDepth(1)
+                self.turretUpgrade.add(self.add.text(740, 480, "500").setOrigin(0.5), false).setDepth(1)
+
 
                 self.turretUpgrade.setVisible(false)
                 self.turretUpgrade.setActive(false)
@@ -349,6 +355,8 @@ export default class game extends Phaser.Scene {
                 self.attackCreate.add(self.add.image(710, 420, "coin").setScale(0.05), true).setDepth(1)
                 self.attackCreate.add(graphics.strokeRoundedRect(670, 150, 140, 140, 32), true).setDepth(1)
                 self.attackCreate.add(graphics.strokeRoundedRect(670, 300, 140, 140, 32), true).setDepth(1)
+
+
 
                 self.textomejoraT = self.add.text(740, 480, "Mejorar Tanque").setOrigin(0.5).setDepth(1)
                 self.textomejoraT.setInteractive()
@@ -397,6 +405,9 @@ export default class game extends Phaser.Scene {
                 self.textomejora.on("pointerout", function () {
                     self.textomejora.setColor("#ffffff")
                 })
+
+                self.tankUpgrade.add(self.add.image(710, 160, "coin").setScale(0.05), false).setDepth(1)
+                self.tankUpgrade.add(self.add.text(740, 160, "500").setOrigin(0.5), false).setDepth(1)
 
                 self.izqT = 0
                 self.izqH = 0
@@ -706,11 +717,48 @@ export default class game extends Phaser.Scene {
                     turretData[1].setTexture(item.texture.key, "TMK" + item.lvl + ".png")
                     turretData[3].setText("Velocidad: " + item.firerate)
                     turretData[4].setText("Daño: " + item.damage)
+                    switch (item.lvl) {
+                        case 1:
+                            turretData[7].setText("500")
+                            this.costoMejora = 500
+                            break;
+                        case 2:
+                            turretData[7].setText("600")
+                            this.costoMejora = 600
+
+                            break;
+                        case 3:
+                            turretData[7].setText("700")
+                            this.costoMejora = 700
+
+                            break;
+                        default:
+                            break;
+                    }
 
                 } else {
                     turretData[1].setTexture("lasers", "LMK" + item.lvl + ".png")
                     turretData[3].setText("Cooldown: " + item.cooldown)
                     turretData[4].setText("Daño: " + item.damage * 30)
+                    switch (item.lvl) {
+                        case 1:
+                            turretData[7].setText("700")
+                            this.costoMejora = 700
+
+                            break;
+                        case 2:
+                            turretData[7].setText("800")
+                            this.costoMejora = 800
+
+                            break;
+                        case 3:
+                            turretData[7].setText("900")
+                            this.costoMejora = 900
+
+                            break;
+                        default:
+                            break;
+                    }
 
                 }
                 turretData[5].removeListener("pointerdown")
@@ -719,43 +767,51 @@ export default class game extends Phaser.Scene {
                 })
                 if (item.lvl === 4) {
                     turretData[5].setVisible(false)
+                    turretData[6].setVisible(false)
+                    turretData[7].setVisible(false)
 
                 }
 
 
                 function upgradelevel() {
-                    if (item.name === "Torreta MK") {
-                        console.log("upgradeado " + item.name)
-                        item.lvl += 1
-                        item.firerate -= 55
-                        item.damage += 20
-                        item.setTexture("turrets", "TMK" + item.lvl + ".png")
-                        turretData[0].setText(item.name + item.lvl)
-                        turretData[1].setTexture("turrets", "TMK" + item.lvl + ".png")
-                        turretData[2].setText("Nivel: " + item.lvl)
-                        turretData[3].setText("Velocidad: " + item.firerate)
-                        turretData[4].setText("Daño: " + item.damage)
-                        self.socket.emit("upgradeTurret", item.x, item.y, item.lvl, item.name, item.firerate, item.damage)
-                        if (item.lvl === 4) {
-                            turretData[5].setVisible(false)
-                        }
+                    if (self.money >= self.costoMejora) {
+                        self.money -= self.costoMejora
+                        self.moneyUI.setText(self.money)
 
-                    } else {
-                        console.log("upgradeado " + item.name)
-                        item.lvl += 1
-                        item.cooldown -= 150
-                        item.damage += 2
-                        item.setTexture("lasers", "LMK" + item.lvl + ".png")
-                        turretData[0].setText(item.name + item.lvl)
-                        turretData[1].setTexture("lasers", "LMK" + item.lvl + ".png")
-                        turretData[2].setText("Nivel: " + item.lvl)
-                        turretData[3].setText("Cooldown: " + item.cooldown)
-                        turretData[4].setText("Daño: " + item.damage * 30)
-                        self.socket.emit("upgradeTurret", item.x, item.y, item.lvl, item.name, item.cooldown, item.damage)
-                        if (item.lvl === 4) {
-                            turretData[5].setVisible(false)
+                        if (item.name === "Torreta MK") {
+                            console.log("upgradeado " + item.name)
+                            item.lvl += 1
+                            item.firerate -= 55
+                            item.damage += 20
+                            item.setTexture("turrets", "TMK" + item.lvl + ".png")
+                            turretData[0].setText(item.name + item.lvl)
+                            turretData[1].setTexture("turrets", "TMK" + item.lvl + ".png")
+                            turretData[2].setText("Nivel: " + item.lvl)
+                            turretData[3].setText("Velocidad: " + item.firerate)
+                            turretData[4].setText("Daño: " + item.damage)
+                            self.socket.emit("upgradeTurret", item.x, item.y, item.lvl, item.name, item.firerate, item.damage)
+                            if (item.lvl === 4) {
+                                turretData[5].setVisible(false)
+                            }
+
+                        } else {
+                            console.log("upgradeado " + item.name)
+                            item.lvl += 1
+                            item.cooldown -= 150
+                            item.damage += 2
+                            item.setTexture("lasers", "LMK" + item.lvl + ".png")
+                            turretData[0].setText(item.name + item.lvl)
+                            turretData[1].setTexture("lasers", "LMK" + item.lvl + ".png")
+                            turretData[2].setText("Nivel: " + item.lvl)
+                            turretData[3].setText("Cooldown: " + item.cooldown)
+                            turretData[4].setText("Daño: " + item.damage * 30)
+                            self.socket.emit("upgradeTurret", item.x, item.y, item.lvl, item.name, item.cooldown, item.damage)
+                            if (item.lvl === 4) {
+                                turretData[5].setVisible(false)
+                            }
                         }
                     }
+
 
                 }
             } else {
@@ -775,18 +831,27 @@ export default class game extends Phaser.Scene {
                         tankData[2].setText("Nivel: " + 1)
                         tankData[3].setText("Velocidad: " + 10)
                         tankData[4].setText("Vida: " + 500)
+
+                        tankData[7].setText("500")
+                        this.costoMejora = 500
                     } else if (it === "TAMK2.png") {
                         tankData[0].setText("Tanque MK2")
                         tankData[1].setTexture("tanks", it)
                         tankData[2].setText("Nivel: " + 2)
                         tankData[3].setText("Velocidad: " + 10)
                         tankData[4].setText("Vida: " + 500)
+
+                        tankData[7].setText("600")
+                        this.costoMejora = 600
                     } else if (it === "TAMK3.png") {
                         tankData[0].setText("Tanque MK3")
                         tankData[1].setTexture("tanks", it)
                         tankData[2].setText("Nivel: " + 3)
                         tankData[3].setText("Velocidad: " + 10)
                         tankData[4].setText("Vida: " + 500)
+
+                        tankData[7].setText("700")
+                        this.costoMejora = 700
                     } else if (it === "TAMK4.png") {
                         tankData[0].setText("Tanque MK4")
                         tankData[1].setTexture("tanks", it)
@@ -794,6 +859,9 @@ export default class game extends Phaser.Scene {
                         tankData[3].setText("Velocidad: " + 10)
                         tankData[4].setText("Vida: " + 500)
                         tankData[5].setVisible(false)
+
+                        tankData[6].setVisible(false)
+                        tankData[7].setVisible(false)
 
                     }
 
@@ -805,18 +873,27 @@ export default class game extends Phaser.Scene {
                         tankData[2].setText("Nivel: " + 1)
                         tankData[3].setText("Velocidad: " + 50)
                         tankData[4].setText("Vida: " + 150)
+
+                        tankData[7].setText("400")
+                        this.costoMejora = 400
                     } else if (it === "HAMK2.png") {
                         tankData[0].setText("Halfer MK2")
                         tankData[1].setTexture("halfers", it)
                         tankData[2].setText("Nivel: " + 2)
                         tankData[3].setText("Velocidad: " + 10)
                         tankData[4].setText("Vida: " + 500)
+
+                        tankData[7].setText("500")
+                        this.costoMejora = 500
                     } else if (it === "HAMK3.png") {
                         tankData[0].setText("Halfer MK3")
                         tankData[1].setTexture("halfers", it)
                         tankData[2].setText("Nivel: " + 3)
                         tankData[3].setText("Velocidad: " + 10)
                         tankData[4].setText("Vida: " + 500)
+
+                        tankData[7].setText("600")
+                        this.costoMejora = 600
                     } else if (it === "HAMK4.png") {
                         tankData[0].setText("Halfer MK4")
                         tankData[1].setTexture("halfers", it)
@@ -824,6 +901,10 @@ export default class game extends Phaser.Scene {
                         tankData[3].setText("Velocidad: " + 10)
                         tankData[4].setText("Vida: " + 500)
                         tankData[5].setVisible(false)
+
+                        tankData[6].setVisible(false)
+                        tankData[7].setVisible(false)
+
 
                     }
                 }
@@ -836,85 +917,103 @@ export default class game extends Phaser.Scene {
                 })
                 let self = this
                 function upgradelevel() {
-                    if (item === "TAMK") {
-                        console.log("upgradeado " + item)
-                        var it = attackData[0].frame.name
+                    if (self.money >= self.costoMejora) {
+                        self.money -= self.costoMejora
+                        self.moneyUI.setText(self.money)
+                        if (item === "TAMK") {
+                            console.log("upgradeado " + item)
+                            var it = attackData[0].frame.name
 
-                        if (it === "TAMK1.png") {
-                            attackData[0].setTexture("tanks", "TAMK2.png")
-                            attackData[2].setText("Tanque MK2")
-                            self.valortank += 50
-                            attackData[4].setText(self.valortank)
+                            if (it === "TAMK1.png") {
+                                attackData[0].setTexture("tanks", "TAMK2.png")
+                                attackData[2].setText("Tanque MK2")
+                                self.valortank += 50
+                                attackData[4].setText(self.valortank)
 
 
-                            tankData[0].setText("Tanque MK2")
-                            tankData[1].setTexture("tanks", "TAMK2.png")
-                            tankData[2].setText("Nivel: " + 2)
-                            tankData[3].setText("Velocidad: " + 20)
-                            tankData[4].setText("Vida: " + 600)
-                        } else if (it === "TAMK2.png") {
-                            attackData[0].setTexture("tanks", "TAMK3.png")
-                            attackData[2].setText("Tanque MK3")
-                            self.valortank += 50
-                            attackData[4].setText(self.valortank)
+                                tankData[0].setText("Tanque MK2")
+                                tankData[1].setTexture("tanks", "TAMK2.png")
+                                tankData[2].setText("Nivel: " + 2)
+                                tankData[3].setText("Velocidad: " + 20)
+                                tankData[4].setText("Vida: " + 600)
+                                tankData[7].setText("600")
+                                self.costoMejora = 600
+                            } else if (it === "TAMK2.png") {
+                                attackData[0].setTexture("tanks", "TAMK3.png")
+                                attackData[2].setText("Tanque MK3")
+                                self.valortank += 50
+                                attackData[4].setText(self.valortank)
 
-                            tankData[0].setText("Tanque MK3")
-                            tankData[1].setTexture("tanks", "TAMK3.png")
-                            tankData[2].setText("Nivel: " + 3)
-                            tankData[3].setText("Velocidad: " + 30)
-                            tankData[4].setText("Vida: " + 700)
-                        } else if (it === "TAMK3.png") {
-                            attackData[0].setTexture("tanks", "TAMK4.png")
-                            attackData[2].setText("Tanque MK4")
-                            self.valortank += 50
-                            attackData[4].setText(self.valortank)
+                                tankData[0].setText("Tanque MK3")
+                                tankData[1].setTexture("tanks", "TAMK3.png")
+                                tankData[2].setText("Nivel: " + 3)
+                                tankData[3].setText("Velocidad: " + 30)
+                                tankData[4].setText("Vida: " + 700)
+                                tankData[7].setText("700")
+                                self.costoMejora = 700
+                            } else if (it === "TAMK3.png") {
+                                attackData[0].setTexture("tanks", "TAMK4.png")
+                                attackData[2].setText("Tanque MK4")
+                                self.valortank += 50
+                                attackData[4].setText(self.valortank)
 
-                            tankData[0].setText("Tanque MK4")
-                            tankData[1].setTexture("tanks", "TAMK4.png")
-                            tankData[2].setText("Nivel: " + 4)
-                            tankData[3].setText("Velocidad: " + 40)
-                            tankData[4].setText("Vida: " + 800)
-                            tankData[5].setVisible(false)
-                        }
+                                tankData[0].setText("Tanque MK4")
+                                tankData[1].setTexture("tanks", "TAMK4.png")
+                                tankData[2].setText("Nivel: " + 4)
+                                tankData[3].setText("Velocidad: " + 40)
+                                tankData[4].setText("Vida: " + 800)
+                                tankData[5].setVisible(false)
+                                tankData[6].setVisible(false)
+                                tankData[7].setVisible(false)
 
-                    } else {
-                        console.log("upgradeado " + item)
-                        var it = attackData[1].frame.name
+                            }
 
-                        if (it === "HAMK1.png") {
-                            attackData[1].setTexture("halfers", "HAMK2.png")
-                            attackData[3].setText("Halfer MK2")
-                            self.valorhalfer += 50
-                            attackData[5].setText(self.valorhalfer)
+                        } else {
+                            console.log("upgradeado " + item)
+                            var it = attackData[1].frame.name
 
-                            tankData[0].setText("Halfer MK2")
-                            tankData[1].setTexture("halfers", "HAMK2.png")
-                            tankData[2].setText("Nivel: " + 2)
-                            tankData[3].setText("Velocidad: " + 60)
-                            tankData[4].setText("Vida: " + 200)
-                        } else if (it === "HAMK2.png") {
-                            attackData[1].setTexture("halfers", "HAMK3.png")
-                            attackData[3].setText("Halfer MK3")
-                            self.valorhalfer += 50
-                            attackData[5].setText(self.valorhalfer)
+                            if (it === "HAMK1.png") {
+                                attackData[1].setTexture("halfers", "HAMK2.png")
+                                attackData[3].setText("Halfer MK2")
+                                self.valorhalfer += 50
+                                attackData[5].setText(self.valorhalfer)
 
-                            tankData[0].setText("Halfer MK3")
-                            tankData[1].setTexture("halfers", "HAMK3.png")
-                            tankData[2].setText("Nivel: " + 3)
-                            tankData[3].setText("Velocidad: " + 70)
-                            tankData[4].setText("Vida: " + 250)
-                        } else if (it === "HAMK3.png") {
-                            attackData[1].setTexture("halfers", "HAMK4.png")
-                            attackData[3].setText("Halfer MK4")
-                            self.valorhalfer += 50
-                            attackData[5].setText(self.valorhalfer)
+                                tankData[0].setText("Halfer MK2")
+                                tankData[1].setTexture("halfers", "HAMK2.png")
+                                tankData[2].setText("Nivel: " + 2)
+                                tankData[3].setText("Velocidad: " + 60)
+                                tankData[4].setText("Vida: " + 200)
+                                tankData[7].setText("500")
+                                self.costoMejora = 500
+                            } else if (it === "HAMK2.png") {
+                                attackData[1].setTexture("halfers", "HAMK3.png")
+                                attackData[3].setText("Halfer MK3")
+                                self.valorhalfer += 50
+                                attackData[5].setText(self.valorhalfer)
 
-                            tankData[0].setText("Halfer MK4")
-                            tankData[1].setTexture("halfers", "HAMK4.png")
-                            tankData[2].setText("Nivel: " + 4)
-                            tankData[3].setText("Velocidad: " + 80)
-                            tankData[4].setText("Vida: " + 300)
-                            tankData[5].setVisible(false)
+                                tankData[0].setText("Halfer MK3")
+                                tankData[1].setTexture("halfers", "HAMK3.png")
+                                tankData[2].setText("Nivel: " + 3)
+                                tankData[3].setText("Velocidad: " + 70)
+                                tankData[4].setText("Vida: " + 250)
+                                tankData[7].setText("600")
+                                self.costoMejora = 600
+                            } else if (it === "HAMK3.png") {
+                                attackData[1].setTexture("halfers", "HAMK4.png")
+                                attackData[3].setText("Halfer MK4")
+                                self.valorhalfer += 50
+                                attackData[5].setText(self.valorhalfer)
+
+                                tankData[0].setText("Halfer MK4")
+                                tankData[1].setTexture("halfers", "HAMK4.png")
+                                tankData[2].setText("Nivel: " + 4)
+                                tankData[3].setText("Velocidad: " + 80)
+                                tankData[4].setText("Vida: " + 300)
+                                tankData[5].setVisible(false)
+                                tankData[6].setVisible(false)
+                                tankData[7].setVisible(false)
+
+                            }
                         }
                     }
                 }
@@ -992,7 +1091,7 @@ export default class game extends Phaser.Scene {
         this.timer2 += delta;
         if (!this.isPlayerA) {
             while (this.timer2 > 1000) {
-                this.money += 20
+                this.money += 30
                 try {
                     this.moneyUI.setText(this.money)
 
