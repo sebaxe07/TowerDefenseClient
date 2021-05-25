@@ -596,7 +596,7 @@ export default class game extends Phaser.Scene {
                     self.TotEnemigos += 1
                     dropZone.data.values.cant += 1;
 
-                    if (dropZone.x === 32) {
+                    if (dropZone.x === 128) {
                         if (gameObject.texture.key === "tanks") {
                             self.izqT += 1
                             self.cantIzq.setText("T: " + self.izqT + "\nH: " + self.izqH)
