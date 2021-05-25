@@ -125,6 +125,11 @@ export default class game extends Phaser.Scene {
             zonesCreation(self.isPlayerA)
 
         })
+        this.socket.on("EmpezarRonda", function () {
+            self.relojRonda.setText("Ronda Empezada")
+            self.spawnEnemy()
+
+        })
 
         this.socket.on("turretPlaced", function (gameObject, isPlayerA, dropzone) {
             if (isPlayerA !== self.isPlayerA) {
@@ -1093,11 +1098,10 @@ export default class game extends Phaser.Scene {
                 console.log("Ronda Empezada!")
                 this.rondaalive = true
 
-                this.relojRonda.setText("Ronda Empezada!")
+                this.relojRonda.setText("Esperando jugador")
+                this.socket.emit("EmpezarRonda")
                 this.segundos = 30
                 this.timer = -1000000
-
-                this.spawnEnemy()
             }
         }
         this.timer2 += delta;
