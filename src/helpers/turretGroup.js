@@ -82,11 +82,4 @@ class Turret extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    create() {
-
-    }
-
-
-
-
 }

@@ -5,9 +5,6 @@ import TurretGroup from "../helpers/turretGroup";
 import BulletGroup from "../helpers/bulletGroup";
 import io from 'socket.io-client';
 
-
-
-
 export default class game extends Phaser.Scene {
     constructor() {
         super("Game")
@@ -1104,6 +1101,10 @@ export default class game extends Phaser.Scene {
             if (this.vida === 0) {
                 this.socket.emit("gameover")
             }
+        } else {
+            this.money += 1000
+            this.moneyUI.setText(this.money)
+            
         }
         if (this.vida !== 0) {
             this.countDead()
