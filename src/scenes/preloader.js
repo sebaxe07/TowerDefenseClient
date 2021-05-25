@@ -9,7 +9,7 @@ export default class preloader extends Phaser.Scene {
     preload() {
         this.load.image("terrain", "src/assets/DIY/TerrainSheet.png")
         this.load.image("walls", "src/assets/DIY/walls.png")
-        this.load.image("bullet", "src/assets/Red/bullet.png")
+        this.load.image("bullet", "src/assets/DIY/bullet.png")
         this.load.image("coin", "src/assets/DIY/dogecoin.png")
 
 
