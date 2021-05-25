@@ -790,8 +790,15 @@ export default class game extends Phaser.Scene {
                             turretData[3].setText("Velocidad: " + item.firerate)
                             turretData[4].setText("Daño: " + item.damage)
                             self.socket.emit("upgradeTurret", item.x, item.y, item.lvl, item.name, item.firerate, item.damage)
+                            self.costoMejora += 100
+                            turretData[7].setText(self.costoMejora)
+
                             if (item.lvl === 4) {
                                 turretData[5].setVisible(false)
+                                turretData[6].setVisible(false)
+                                turretData[7].setVisible(false)
+
+
                             }
 
                         } else {
@@ -806,8 +813,13 @@ export default class game extends Phaser.Scene {
                             turretData[3].setText("Cooldown: " + item.cooldown)
                             turretData[4].setText("Daño: " + item.damage * 30)
                             self.socket.emit("upgradeTurret", item.x, item.y, item.lvl, item.name, item.cooldown, item.damage)
+                            self.costoMejora += 100
+                            turretData[7].setText(self.costoMejora)
+
                             if (item.lvl === 4) {
                                 turretData[5].setVisible(false)
+                                turretData[6].setVisible(false)
+                                turretData[7].setVisible(false)
                             }
                         }
                     }
