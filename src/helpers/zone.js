@@ -9,6 +9,15 @@ export default class Zone{
             return dropZone;
         }
 
+        this.renderZoneT = (x, y, wx, wy) => {
+            let dropZone = scene.add.zone(x, y, wx, wy).setRectangleDropZone(wx, wy);
+            dropZone.setData({
+                used:  false,
+                cant: 0
+            });
+            return dropZone;
+        }
+
         this.renderOutline = (dropZone) => {
             let dropZoneOutline = scene.add.graphics();
             dropZoneOutline.lineStyle(4, 0xff69b4);

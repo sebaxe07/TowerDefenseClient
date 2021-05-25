@@ -49,6 +49,8 @@ export default class game extends Phaser.Scene {
         this.rondaUI
         this.textomejoraH
         this.textomejoraT
+        this.newRo
+        this.winScreen
 
 
 
@@ -91,6 +93,7 @@ export default class game extends Phaser.Scene {
         this.relojRonda
         this.moneyUI
         this.vidaUI
+        this.newRo
         this.winScreen
         this.rondaUI
         this.textomejoraH
@@ -185,34 +188,50 @@ export default class game extends Phaser.Scene {
         })
 
         this.socket.on("newRound", function () {
-            self.ronda += 1
-            self.rondaUI.setText("Ronda: " + self.ronda)
 
+            self.newRo.add(self.add.rectangle(self.cameras.main.centerX, self.cameras.main.centerY, 400, 200, 0xffffff))
+            self.newRo.add(self.add.text(self.cameras.main.centerX, self.cameras.main.centerY, "Siguiente ronda").setFontSize(40).setFontFamily("Trebuchet MS").setColor("#000000").setOrigin(0.5))
 
-            self.timer = 2000
-            self.rondaalive = false
+            setTimeout(() => {
 
-            self.TotEnemigos = 0
-            self.countD = 0
-            if (!self.isPlayerA) {
-                self.izqT = 0
-                self.izqH = 0
-                self.derT = 0
-                self.derH = 0
+                if (self.isPlayerA) {
+                    if (self.ronda === 11) {
+                        self.socket.emit("gameover")
 
-                self.cantIzq.setText("T: " + self.izqT + "\nH: " + self.izqH)
-
-                self.cantDer.setText("T: " + self.derT + "\nH: " + self.derH)
-            }
-
-            self.enemyGroup = new EnemyGroup(self)
-            self.physics.add.overlap(self.enemyGroup, self.bulletsGroup, damageEnemy);
-            if (self.isPlayerA) {
-                if (self.ronda === 11) {
-                    self.socket.emit("gameover")
-
+                    }
                 }
-            }
+
+                self.ronda += 1
+                self.rondaUI.setText("Ronda: " + self.ronda)
+
+                self.timer = 2000
+                self.rondaalive = false
+
+                self.TotEnemigos = 0
+                self.countD = 0
+                if (!self.isPlayerA) {
+                    self.izqT = 0
+                    self.izqH = 0
+                    self.derT = 0
+                    self.derH = 0
+
+                    self.cantIzq.setText("T: " + self.izqT + "\nH: " + self.izqH)
+
+                    self.cantDer.setText("T: " + self.derT + "\nH: " + self.derH)
+                }
+
+                self.enemyGroup = new EnemyGroup(self)
+                self.newRo.setVisible(false)
+                self.newRo = self.add.group().setDepth(6)
+
+
+
+                self.physics.add.overlap(self.enemyGroup, self.bulletsGroup, damageEnemy);
+            }, 1000);
+
+
+
+
 
         })
 
@@ -271,7 +290,11 @@ export default class game extends Phaser.Scene {
         this.turretUpgrade = this.add.group().setDepth(1)
         this.attackCreate = this.add.group().setDepth(1)
         this.tankUpgrade = this.add.group().setDepth(1)
+        this.newRo = this.add.group().setDepth(6)
         this.winScreen = this.add.group().setDepth(6)
+
+
+
 
 
 
@@ -651,8 +674,8 @@ export default class game extends Phaser.Scene {
             } else {
                 self.zone = new Zone(self)
 
-                self.T1 = self.zone.renderZone(32, 96)
-                self.T2 = self.zone.renderZone(608, 224)
+                self.T1 = self.zone.renderZoneT(128, 96, 256, 192)
+                self.T2 = self.zone.renderZoneT(576, 224, 128, 192)
                 /*
                 self.outline1 = self.zone.renderOutline(self.T1)
                 self.outline2 = self.zone.renderOutline(self.T2)
