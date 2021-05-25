@@ -1103,7 +1103,7 @@ export default class game extends Phaser.Scene {
         this.timer2 += delta;
         if (!this.isPlayerA) {
             while (this.timer2 > 1000) {
-                this.money += 30
+                this.money += 50
                 try {
                     this.moneyUI.setText(this.money)
 
