@@ -194,6 +194,9 @@ export default class game extends Phaser.Scene {
 
             setTimeout(() => {
 
+                self.ronda += 1
+                self.rondaUI.setText("Ronda: " + self.ronda)
+
                 if (self.isPlayerA) {
                     if (self.ronda === 11) {
                         self.socket.emit("gameover")
@@ -201,8 +204,7 @@ export default class game extends Phaser.Scene {
                     }
                 }
 
-                self.ronda += 1
-                self.rondaUI.setText("Ronda: " + self.ronda)
+                
 
                 self.timer = 2000
                 self.rondaalive = false
